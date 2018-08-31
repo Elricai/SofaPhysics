@@ -49,6 +49,8 @@ public unsafe class SofaPhysicsAPI : MonoBehaviour
     public static extern unsafe float* GetMeshVerticesPositions(int meshID);
     [DllImport("runSofa", EntryPoint = "GetMeshVerticesAmount")]
     public static extern int GetMeshVerticesAmount(int meshID);
+    [DllImport("runSofa", EntryPoint = "GetMeshVerticesNormals")]
+    public static extern unsafe float* GetMeshVerticesNormals(int meshID);
     //MechanicalObject信息相关
     [DllImport("runSofa", EntryPoint = "GetMechanicalObjectVerticesAmount")]
     public static extern int GetMechanicalObjectVerticesAmount(char* mechanicalObjectName);

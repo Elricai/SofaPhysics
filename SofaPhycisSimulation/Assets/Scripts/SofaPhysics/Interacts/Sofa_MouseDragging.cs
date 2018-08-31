@@ -15,6 +15,8 @@ public class Sofa_MouseDragging : MonoBehaviour {
     private float miniumDis = -1;
     private Vector3 draggingMechanicalObjectPointPosition = Vector3.zero;
     //鼠标位置相对拖拽点的映射位置
+    private bool isDraggingMousePositionSet = false;
+    private float draggingMousePositionZ = 0;
     private Vector3 draggingMousePosition = Vector3.zero;
     //开启拖拽gizmos的flag
     private bool drawGizmos=false;
@@ -91,6 +93,7 @@ public class Sofa_MouseDragging : MonoBehaviour {
         SofaPhysicsAPI.RemoveMechanicalObject(SofaPhysics.ToChar("root"), SofaPhysics.ToChar(mechanicalObjectName));
         SofaPhysics.unityMechanicalObjectInfoDic.Remove(mechanicalObjectName);
         SofaPhysics.sofaMechanicalObjectInfoDic.Remove(mechanicalObjectName);
+        isDraggingMousePositionSet = false;
     }
     /// <summary>
     /// 获取拖拽点，即所有SofaMechanicalObject信息中，离鼠标点击屏幕位置最近的点
@@ -134,10 +137,14 @@ public class Sofa_MouseDragging : MonoBehaviour {
                 draggingMechanicalObjectPointPosition = unityMechanicalObjectInfo.verticesPosition[draggingMechanicalObjectPointIndex];
             }
         }
-        //鼠标的Z轴深度与拖拽点到屏幕的深度相同
-        Plane camPlane = new Plane(mainCamera.ScreenToWorldPoint(new Vector3(0, 0, 0)), new Vector3(100, 0, 0), new Vector3(0, 100, 0));
-        float distanceZ = camPlane.GetDistanceToPoint(draggingMechanicalObjectPointPosition);
-        draggingMousePosition = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, distanceZ));
+        //鼠标的Z轴深度与拖拽点到屏幕的深度相同,该深度只在拖拽开始时获得一次，不会随物体的移动而变化
+        if(isDraggingMousePositionSet == false)
+        {
+            Plane camPlane = new Plane(mainCamera.ScreenToWorldPoint(new Vector3(0, 0, 0)), new Vector3(100, 0, 0), new Vector3(0, 100, 0));
+            draggingMousePositionZ = camPlane.GetDistanceToPoint(draggingMechanicalObjectPointPosition);
+            isDraggingMousePositionSet = true;
+        }
+        draggingMousePosition = mainCamera.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, draggingMousePositionZ));
     }
     /// <summary>
     /// 更改鼠标MehcanicalObject信息

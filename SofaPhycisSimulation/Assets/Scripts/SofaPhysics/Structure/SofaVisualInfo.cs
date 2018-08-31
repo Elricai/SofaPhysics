@@ -18,6 +18,7 @@ public unsafe class SofaMeshInfo
         triangleTopology = SofaPhysicsAPI.GetMeshTriangleTopology(meshIndex);
         quadAmount = SofaPhysicsAPI.GetMeshQuadAmount(meshIndex);
         quadTopology = SofaPhysicsAPI.GetMeshQuadTopology(meshIndex);
+        verticesNormalInfo = SofaPhysicsAPI.GetMeshVerticesNormals(meshIndex);
     }
 
     public int meshIndex;
@@ -32,8 +33,8 @@ public unsafe class SofaMeshInfo
     public int quadAmount;
     public int* quadTopology;
 
-    public float* normalInfo;
-    public float* uVInfo;
+    public float* verticesNormalInfo;
+    public float* verticesUVInfo;
 }
 public unsafe class SofaMechanicalObjectInfo
 {
@@ -83,49 +84,102 @@ public unsafe class UnityMeshInfo
     }
     public void Update(SofaMeshInfo sofaMeshInfo)
     {
-        if(componentName==sofaMeshInfo.componentName)
+        verticesPosition = new Vector3[0];
+        verticesNormalInfo = new Vector3[0];
+        if (componentName==sofaMeshInfo.componentName)
         {
-            verticesPosition = new Vector3[sofaMeshInfo.verticesAmount];
-            for (int i = 0; i < sofaMeshInfo.verticesAmount; i++)
-            {
-                verticesPosition[i].x = sofaMeshInfo.verticesPosition[i * 3 + 0];
-                verticesPosition[i].y = sofaMeshInfo.verticesPosition[i * 3 + 1];
-                verticesPosition[i].z = sofaMeshInfo.verticesPosition[i * 3 + 2];
-            }
             if (sofaMeshInfo.triangleAmount != 0)
             {
+                verticesPosition = new Vector3[sofaMeshInfo.triangleAmount * 3];
+                verticesNormalInfo = new Vector3[sofaMeshInfo.triangleAmount * 3];
                 triangleTopology = new int[sofaMeshInfo.triangleAmount * 3];
-
                 for (int i = 0; i < sofaMeshInfo.triangleAmount; i++)
                 {
-                    //1triangletopology = 3 vertices
-                    //1triangletopology = 1 triangles
-                    //由topology生成vertice！
-                    triangleTopology[i * 3 + 0] = sofaMeshInfo.triangleTopology[i * 3 + 0];
-                    triangleTopology[i * 3 + 1] = sofaMeshInfo.triangleTopology[i * 3 + 1];
-                    triangleTopology[i * 3 + 2] = sofaMeshInfo.triangleTopology[i * 3 + 2];
+                    triangleTopology[i * 3 + 0] = i * 3 + 0;
+                    verticesPosition[i * 3 + 0].x = sofaMeshInfo.verticesPosition[sofaMeshInfo.triangleTopology[i * 3 + 0] * 3 + 0];
+                    verticesPosition[i * 3 + 0].y = sofaMeshInfo.verticesPosition[sofaMeshInfo.triangleTopology[i * 3 + 0] * 3 + 1];
+                    verticesPosition[i * 3 + 0].z = sofaMeshInfo.verticesPosition[sofaMeshInfo.triangleTopology[i * 3 + 0] * 3 + 2];
+                    verticesNormalInfo[i * 3 + 0].x = sofaMeshInfo.verticesNormalInfo[sofaMeshInfo.triangleTopology[i * 3 + 0] * 3 + 0];
+                    verticesNormalInfo[i * 3 + 0].y = sofaMeshInfo.verticesNormalInfo[sofaMeshInfo.triangleTopology[i * 3 + 0] * 3 + 1];
+                    verticesNormalInfo[i * 3 + 0].z = sofaMeshInfo.verticesNormalInfo[sofaMeshInfo.triangleTopology[i * 3 + 0] * 3 + 2];
+
+                    triangleTopology[i * 3 + 1] = i * 3 + 1;
+                    verticesPosition[i * 3 + 1].x = sofaMeshInfo.verticesPosition[sofaMeshInfo.triangleTopology[i * 3 + 1] * 3 + 0];
+                    verticesPosition[i * 3 + 1].y = sofaMeshInfo.verticesPosition[sofaMeshInfo.triangleTopology[i * 3 + 1] * 3 + 1];
+                    verticesPosition[i * 3 + 1].z = sofaMeshInfo.verticesPosition[sofaMeshInfo.triangleTopology[i * 3 + 1] * 3 + 2];
+                    verticesNormalInfo[i * 3 + 1].x = sofaMeshInfo.verticesNormalInfo[sofaMeshInfo.triangleTopology[i * 3 + 1] * 3 + 0];
+                    verticesNormalInfo[i * 3 + 1].y = sofaMeshInfo.verticesNormalInfo[sofaMeshInfo.triangleTopology[i * 3 + 1] * 3 + 1];
+                    verticesNormalInfo[i * 3 + 1].z = sofaMeshInfo.verticesNormalInfo[sofaMeshInfo.triangleTopology[i * 3 + 1] * 3 + 2];
+
+                    triangleTopology[i * 3 + 2] = i * 3 + 2;
+                    verticesPosition[i * 3 + 2].x = sofaMeshInfo.verticesPosition[sofaMeshInfo.triangleTopology[i * 3 + 2] * 3 + 0];
+                    verticesPosition[i * 3 + 2].y = sofaMeshInfo.verticesPosition[sofaMeshInfo.triangleTopology[i * 3 + 2] * 3 + 1];
+                    verticesPosition[i * 3 + 2].z = sofaMeshInfo.verticesPosition[sofaMeshInfo.triangleTopology[i * 3 + 2] * 3 + 2];
+                    verticesNormalInfo[i * 3 + 2].x = sofaMeshInfo.verticesNormalInfo[sofaMeshInfo.triangleTopology[i * 3 + 2] * 3 + 0];
+                    verticesNormalInfo[i * 3 + 2].y = sofaMeshInfo.verticesNormalInfo[sofaMeshInfo.triangleTopology[i * 3 + 2] * 3 + 1];
+                    verticesNormalInfo[i * 3 + 2].z = sofaMeshInfo.verticesNormalInfo[sofaMeshInfo.triangleTopology[i * 3 + 2] * 3 + 2];
                 }
             }
             else
             {
+                verticesPosition = new Vector3[sofaMeshInfo.quadAmount * 6];
+                verticesNormalInfo = new Vector3[sofaMeshInfo.quadAmount * 6];
                 triangleTopology = new int[sofaMeshInfo.quadAmount * 6];
                 for (int i = 0; i < sofaMeshInfo.quadAmount; i++)
                 {
-                    //1quadtopology = 6 vertices
-                    //1quadtopology = 2 triangles
-                    //由topology生成vertice！
-                    triangleTopology[i * 6 + 0] = sofaMeshInfo.quadTopology[i * 4 + 0];
-                    triangleTopology[i * 6 + 1] = sofaMeshInfo.quadTopology[i * 4 + 1];
-                    triangleTopology[i * 6 + 2] = sofaMeshInfo.quadTopology[i * 4 + 2];
-                    triangleTopology[i * 6 + 3] = sofaMeshInfo.quadTopology[i * 4 + 2];
-                    triangleTopology[i * 6 + 4] = sofaMeshInfo.quadTopology[i * 4 + 3];
-                    triangleTopology[i * 6 + 5] = sofaMeshInfo.quadTopology[i * 4 + 0];
+                    triangleTopology[i * 6 + 0] = i * 6 + 0;
+                    verticesPosition[i * 6 + 0].x = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 0] * 3 + 0];
+                    verticesPosition[i * 6 + 0].y = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 0] * 3 + 1];
+                    verticesPosition[i * 6 + 0].z = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 0] * 3 + 2];
+                    verticesNormalInfo[i * 6 + 0].x = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 0] * 3 + 0];
+                    verticesNormalInfo[i * 6 + 0].y = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 0] * 3 + 1];
+                    verticesNormalInfo[i * 6 + 0].z = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 0] * 3 + 2];
+
+                    triangleTopology[i * 6 + 1] = i * 6 + 1;
+                    verticesPosition[i * 6 + 1].x = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 1] * 3 + 0];
+                    verticesPosition[i * 6 + 1].y = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 1] * 3 + 1];
+                    verticesPosition[i * 6 + 1].z = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 1] * 3 + 2];
+                    verticesNormalInfo[i * 6 + 1].x = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 1] * 3 + 0];
+                    verticesNormalInfo[i * 6 + 1].y = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 1] * 3 + 1];
+                    verticesNormalInfo[i * 6 + 1].z = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 1] * 3 + 2];
+
+                    triangleTopology[i * 6 + 2] = i * 6 + 2;
+                    verticesPosition[i * 6 + 2].x = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 2] * 3 + 0];
+                    verticesPosition[i * 6 + 2].y = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 2] * 3 + 1];
+                    verticesPosition[i * 6 + 2].z = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 2] * 3 + 2];
+                    verticesNormalInfo[i * 6 + 2].x = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 2] * 3 + 0];
+                    verticesNormalInfo[i * 6 + 2].y = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 2] * 3 + 1];
+                    verticesNormalInfo[i * 6 + 2].z = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 2] * 3 + 2];
+
+                    triangleTopology[i * 6 + 3] = i * 6 + 3;
+                    verticesPosition[i * 6 + 3].x = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 2] * 3 + 0];
+                    verticesPosition[i * 6 + 3].y = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 2] * 3 + 1];
+                    verticesPosition[i * 6 + 3].z = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 2] * 3 + 2];
+                    verticesNormalInfo[i * 6 + 3].x = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 2] * 3 + 0];
+                    verticesNormalInfo[i * 6 + 3].y = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 2] * 3 + 1];
+                    verticesNormalInfo[i * 6 + 3].z = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 2] * 3 + 2];
+
+                    triangleTopology[i * 6 + 4] = i * 6 + 4;
+                    verticesPosition[i * 6 + 4].x = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 3] * 3 + 0];
+                    verticesPosition[i * 6 + 4].y = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 3] * 3 + 1];
+                    verticesPosition[i * 6 + 4].z = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 3] * 3 + 2];
+                    verticesNormalInfo[i * 6 + 4].x = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 3] * 3 + 0];
+                    verticesNormalInfo[i * 6 + 4].y = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 3] * 3 + 1];
+                    verticesNormalInfo[i * 6 + 4].z = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 3] * 3 + 2];
+
+                    triangleTopology[i * 6 + 5] = i * 6 + 5;
+                    verticesPosition[i * 6 + 5].x = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 0] * 3 + 0];
+                    verticesPosition[i * 6 + 5].y = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 0] * 3 + 1];
+                    verticesPosition[i * 6 + 5].z = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 0] * 3 + 2];
+                    verticesNormalInfo[i * 6 + 5].x = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 0] * 3 + 0];
+                    verticesNormalInfo[i * 6 + 5].y = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 0] * 3 + 1];
+                    verticesNormalInfo[i * 6 + 5].z = sofaMeshInfo.verticesPosition[sofaMeshInfo.quadTopology[i * 4 + 0] * 3 + 2];
                 }
             }
-
+            dynamicMesh.Clear();
             dynamicMesh.vertices = verticesPosition;
+            dynamicMesh.normals = verticesNormalInfo;
             dynamicMesh.triangles = triangleTopology;
-            dynamicMesh.RecalculateNormals();
             meshCollider.sharedMesh = dynamicMesh;
 
             meshRenderer.enabled = node.GetComponent<Sofa_OglModel>().isRenderingObject;
@@ -141,7 +195,7 @@ public unsafe class UnityMeshInfo
     public string componentName;
     public Vector3[] verticesPosition;
     public int[] triangleTopology;
-    public Vector3[] normalInfo;
+    public Vector3[] verticesNormalInfo;
     public Vector2[] uVInfo;
 
     public Material mat;
@@ -199,85 +253,176 @@ public unsafe class UnityMechanicalObjectInfo
     {
         if(componentName == sofaMechanicalObjectInfo.componentName)
         {
-            verticesPosition = new Vector3[sofaMechanicalObjectInfo.verticesAmount];
-            for (int i = 0; i < sofaMechanicalObjectInfo.verticesAmount; i++)
+            verticesPosition = new Vector3[sofaMechanicalObjectInfo.verticesAmount * 3];
+            for(int i =0;i<sofaMechanicalObjectInfo.verticesAmount;i++)
             {
                 verticesPosition[i].x = sofaMechanicalObjectInfo.verticesPosition[i * 3 + 0];
                 verticesPosition[i].y = sofaMechanicalObjectInfo.verticesPosition[i * 3 + 1];
                 verticesPosition[i].z = sofaMechanicalObjectInfo.verticesPosition[i * 3 + 2];
             }
+
+            triangleVerticesPosition = new Vector3[sofaMechanicalObjectInfo.triangleAmount * 3];
             triangleTopology = new int[sofaMechanicalObjectInfo.triangleAmount * 3];
             for (int i = 0; i < sofaMechanicalObjectInfo.triangleAmount; i++)
             {
-                //1triangletopology = 3 vertices
-                //1triangletopology = 1 triangles
-                //由topology生成vertice！
-                triangleTopology[i * 3 + 0] = sofaMechanicalObjectInfo.triangleTopology[i * 3 + 0];
-                triangleTopology[i * 3 + 1] = sofaMechanicalObjectInfo.triangleTopology[i * 3 + 1];
-                triangleTopology[i * 3 + 2] = sofaMechanicalObjectInfo.triangleTopology[i * 3 + 2];
+                triangleTopology[i * 3 + 0] = i * 3 + 0;
+                triangleVerticesPosition[i * 3 + 0].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.triangleTopology[i * 3 + 0] * 3 + 0];
+                triangleVerticesPosition[i * 3 + 0].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.triangleTopology[i * 3 + 0] * 3 + 1];
+                triangleVerticesPosition[i * 3 + 0].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.triangleTopology[i * 3 + 0] * 3 + 2];
+
+                triangleTopology[i * 3 + 1] = i * 3 + 1;
+                triangleVerticesPosition[i * 3 + 1].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.triangleTopology[i * 3 + 1] * 3 + 0];
+                triangleVerticesPosition[i * 3 + 1].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.triangleTopology[i * 3 + 1] * 3 + 1];
+                triangleVerticesPosition[i * 3 + 1].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.triangleTopology[i * 3 + 1] * 3 + 2];
+
+                triangleTopology[i * 3 + 2] = i * 3 + 2;
+                triangleVerticesPosition[i * 3 + 2].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.triangleTopology[i * 3 + 2] * 3 + 0];
+                triangleVerticesPosition[i * 3 + 2].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.triangleTopology[i * 3 + 2] * 3 + 1];
+                triangleVerticesPosition[i * 3 + 2].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.triangleTopology[i * 3 + 2] * 3 + 2];
             }
+            
+            quadVerticesPosition = new Vector3[sofaMechanicalObjectInfo.quadAmount * 6];
             quadTopology = new int[sofaMechanicalObjectInfo.quadAmount * 6];
             for (int i = 0; i < sofaMechanicalObjectInfo.quadAmount; i++)
             {
-                //1quadtopology = 6 vertices
-                //1quadtopology = 2 triangles
-                //由topology生成vertice！
-                quadTopology[i * 6 + 0] = sofaMechanicalObjectInfo.quadTopology[i * 4 + 0];
-                quadTopology[i * 6 + 1] = sofaMechanicalObjectInfo.quadTopology[i * 4 + 1];
-                quadTopology[i * 6 + 2] = sofaMechanicalObjectInfo.quadTopology[i * 4 + 2];
-                quadTopology[i * 6 + 3] = sofaMechanicalObjectInfo.quadTopology[i * 4 + 2];
-                quadTopology[i * 6 + 4] = sofaMechanicalObjectInfo.quadTopology[i * 4 + 3];
-                quadTopology[i * 6 + 5] = sofaMechanicalObjectInfo.quadTopology[i * 4 + 0];
+                quadTopology[i * 6 + 0] = i * 6 + 0;
+                quadVerticesPosition[i * 6 + 0].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.quadTopology[i * 4 + 0] * 3 + 0];
+                quadVerticesPosition[i * 6 + 0].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.quadTopology[i * 4 + 0] * 3 + 1];
+                quadVerticesPosition[i * 6 + 0].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.quadTopology[i * 4 + 0] * 3 + 2];
+
+                quadTopology[i * 6 + 1] = i * 6 + 1;
+                quadVerticesPosition[i * 6 + 1].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.quadTopology[i * 4 + 1] * 3 + 0];
+                quadVerticesPosition[i * 6 + 1].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.quadTopology[i * 4 + 1] * 3 + 1];
+                quadVerticesPosition[i * 6 + 1].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.quadTopology[i * 4 + 1] * 3 + 2];
+
+                quadTopology[i * 6 + 2] = i * 6 + 2;
+                quadVerticesPosition[i * 6 + 2].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.quadTopology[i * 4 + 2] * 3 + 0];
+                quadVerticesPosition[i * 6 + 2].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.quadTopology[i * 4 + 2] * 3 + 1];
+                quadVerticesPosition[i * 6 + 2].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.quadTopology[i * 4 + 2] * 3 + 2];
+
+                quadTopology[i * 6 + 3] = i * 6 + 3;
+                quadVerticesPosition[i * 6 + 3].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.quadTopology[i * 4 + 2] * 3 + 0];
+                quadVerticesPosition[i * 6 + 3].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.quadTopology[i * 4 + 2] * 3 + 1];
+                quadVerticesPosition[i * 6 + 3].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.quadTopology[i * 4 + 2] * 3 + 2];
+
+                quadTopology[i * 6 + 4] = i * 6 + 4;
+                quadVerticesPosition[i * 6 + 4].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.quadTopology[i * 4 + 3] * 3 + 0];
+                quadVerticesPosition[i * 6 + 4].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.quadTopology[i * 4 + 3] * 3 + 1];
+                quadVerticesPosition[i * 6 + 4].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.quadTopology[i * 4 + 3] * 3 + 2];
+
+                quadTopology[i * 6 + 5] = i * 6 + 5;
+                quadVerticesPosition[i * 6 + 5].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.quadTopology[i * 4 + 0] * 3 + 0];
+                quadVerticesPosition[i * 6 + 5].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.quadTopology[i * 4 + 0] * 3 + 1];
+                quadVerticesPosition[i * 6 + 5].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.quadTopology[i * 4 + 0] * 3 + 2];
             }
+
+            tetrahedraVerticesPosition = new Vector3[sofaMechanicalObjectInfo.tetrahedraAmount * 12];
             tetrahedraTopology = new int[sofaMechanicalObjectInfo.tetrahedraAmount * 12];
             for (int i = 0; i < sofaMechanicalObjectInfo.tetrahedraAmount; i++)
             {
-                //1tetrahedratopology = 12 vertices
-                //1tetrahedratopology = 4 triangles
-                //由topology生成vertice！
-                tetrahedraTopology[i * 12 + 0] = sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 0];
-                tetrahedraTopology[i * 12 + 1] = sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 1];
-                tetrahedraTopology[i * 12 + 2] = sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 2];
-                tetrahedraTopology[i * 12 + 3] = sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 0];
-                tetrahedraTopology[i * 12 + 4] = sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 2];
-                tetrahedraTopology[i * 12 + 5] = sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 3];
-                tetrahedraTopology[i * 12 + 6] = sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 0];
-                tetrahedraTopology[i * 12 + 7] = sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 3];
-                tetrahedraTopology[i * 12 + 8] = sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 1];
-                tetrahedraTopology[i * 12 + 9] = sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 1];
-                tetrahedraTopology[i * 12 + 10] = sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 3];
-                tetrahedraTopology[i * 12 + 11] = sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 2];
-            }
-            if(triangleDynamicMesh!=null)
-            {
-                triangleDynamicMesh.vertices = verticesPosition;
-                triangleDynamicMesh.triangles = triangleTopology;
-                triangleDynamicMesh.RecalculateNormals();
-                triangleMeshCollider.sharedMesh = triangleDynamicMesh;
+                tetrahedraTopology[i * 12 + 0] = i * 12 + 0;
+                tetrahedraVerticesPosition[i * 12 + 0].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 0] * 3 + 0];
+                tetrahedraVerticesPosition[i * 12 + 0].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 0] * 3 + 1];
+                tetrahedraVerticesPosition[i * 12 + 0].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 0] * 3 + 2];
 
-                triangleMeshRenderer.enabled = node.GetComponent<Sofa_MechanicalObject>().isRenderingTriangle;
-                triangleMeshCollider.enabled = node.GetComponent<Sofa_MechanicalObject>().isTriangleCastingRay;
-            }
-            if (quadDynamicMesh != null)
-            {
-                quadDynamicMesh.vertices = verticesPosition;
-                quadDynamicMesh.triangles = quadTopology;
-                quadDynamicMesh.RecalculateNormals();
-                quadMeshCollider.sharedMesh = quadDynamicMesh;
+                tetrahedraTopology[i * 12 + 1] = i * 12 + 1;
+                tetrahedraVerticesPosition[i * 12 + 1].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 2] * 3 + 0];
+                tetrahedraVerticesPosition[i * 12 + 1].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 2] * 3 + 1];
+                tetrahedraVerticesPosition[i * 12 + 1].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 2] * 3 + 2];
 
-                quadMeshRenderer.enabled = node.GetComponent<Sofa_MechanicalObject>().isRenderingQuad;
-                quadMeshCollider.enabled = node.GetComponent<Sofa_MechanicalObject>().isQuadCastingRay;
-            }
-            if(tetrahedraDynamicMesh!=null)
-            {
-                tetrahedraDynamicMesh.vertices = verticesPosition;
-                tetrahedraDynamicMesh.triangles = tetrahedraTopology;
-                tetrahedraDynamicMesh.RecalculateNormals();
-                tetrahedraMeshCollider.sharedMesh = tetrahedraDynamicMesh;
+                tetrahedraTopology[i * 12 + 2] = i * 12 + 2;
+                tetrahedraVerticesPosition[i * 12 + 2].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 1] * 3 + 0];
+                tetrahedraVerticesPosition[i * 12 + 2].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 1] * 3 + 1];
+                tetrahedraVerticesPosition[i * 12 + 2].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 1] * 3 + 2];
 
-                tetrahedraMeshRenderer.enabled = node.GetComponent<Sofa_MechanicalObject>().isRenderingTetrahedra;
-                tetrahedraMeshCollider.enabled = node.GetComponent<Sofa_MechanicalObject>().isTetrahedraCastingRay;
+                tetrahedraTopology[i * 12 + 3] = i * 12 + 3;
+                tetrahedraVerticesPosition[i * 12 + 3].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 0] * 3 + 0];
+                tetrahedraVerticesPosition[i * 12 + 3].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 0] * 3 + 1];
+                tetrahedraVerticesPosition[i * 12 + 3].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 0] * 3 + 2];
+
+                tetrahedraTopology[i * 12 + 4] = i * 12 + 4;
+                tetrahedraVerticesPosition[i * 12 + 4].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 3] * 3 + 0];
+                tetrahedraVerticesPosition[i * 12 + 4].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 3] * 3 + 1];
+                tetrahedraVerticesPosition[i * 12 + 4].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 3] * 3 + 2];
+
+                tetrahedraTopology[i * 12 + 5] = i * 12 + 5;
+                tetrahedraVerticesPosition[i * 12 + 5].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 2] * 3 + 0];
+                tetrahedraVerticesPosition[i * 12 + 5].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 2] * 3 + 1];
+                tetrahedraVerticesPosition[i * 12 + 5].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 2] * 3 + 2];
+
+                tetrahedraTopology[i * 12 + 6] = i * 12 + 6;
+                tetrahedraVerticesPosition[i * 12 + 6].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 0] * 3 + 0];
+                tetrahedraVerticesPosition[i * 12 + 6].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 0] * 3 + 1];
+                tetrahedraVerticesPosition[i * 12 + 6].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 0] * 3 + 2];
+
+                tetrahedraTopology[i * 12 + 7] = i * 12 + 7;
+                tetrahedraVerticesPosition[i * 12 + 7].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 1] * 3 + 0];
+                tetrahedraVerticesPosition[i * 12 + 7].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 1] * 3 + 1];
+                tetrahedraVerticesPosition[i * 12 + 7].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 1] * 3 + 2];
+
+                tetrahedraTopology[i * 12 + 8] = i * 12 + 8;
+                tetrahedraVerticesPosition[i * 12 + 8].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 3] * 3 + 0];
+                tetrahedraVerticesPosition[i * 12 + 8].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 3] * 3 + 1];
+                tetrahedraVerticesPosition[i * 12 + 8].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 3] * 3 + 2];
+
+                tetrahedraTopology[i * 12 + 9] = i * 12 + 9;
+                tetrahedraVerticesPosition[i * 12 + 9].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 1] * 3 + 0];
+                tetrahedraVerticesPosition[i * 12 + 9].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 1] * 3 + 1];
+                tetrahedraVerticesPosition[i * 12 + 9].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 1] * 3 + 2];
+
+                tetrahedraTopology[i * 12 + 10] = i * 12 + 10;
+                tetrahedraVerticesPosition[i * 12 + 10].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 2] * 3 + 0];
+                tetrahedraVerticesPosition[i * 12 + 10].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 2] * 3 + 1];
+                tetrahedraVerticesPosition[i * 12 + 10].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 2] * 3 + 2];
+
+                tetrahedraTopology[i * 12 + 11] = i * 12 + 11;
+                tetrahedraVerticesPosition[i * 12 + 11].x = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 3] * 3 + 0];
+                tetrahedraVerticesPosition[i * 12 + 11].y = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 3] * 3 + 1];
+                tetrahedraVerticesPosition[i * 12 + 11].z = sofaMechanicalObjectInfo.verticesPosition[sofaMechanicalObjectInfo.tetrahedraTopology[i * 4 + 3] * 3 + 2];
             }
+           if(triangleDynamicMesh!=null)
+           {
+               //triangleDynamicMesh.Clear();
+               triangleDynamicMesh.triangles = new int[0];
+               triangleDynamicMesh.vertices = new Vector3[0];
+
+               triangleDynamicMesh.vertices = triangleVerticesPosition;
+               triangleDynamicMesh.triangles = triangleTopology;
+               triangleDynamicMesh.RecalculateNormals();
+               triangleMeshCollider.sharedMesh = triangleDynamicMesh;
+
+               triangleMeshRenderer.enabled = node.GetComponent<Sofa_MechanicalObject>().isRenderingTriangle;
+               triangleMeshCollider.enabled = node.GetComponent<Sofa_MechanicalObject>().isTriangleCastingRay;
+           }
+
+           if (quadDynamicMesh != null)
+           {
+               //quadDynamicMesh.Clear();
+               quadDynamicMesh.triangles = new int[0];
+               quadDynamicMesh.vertices = new Vector3[0];
+
+               quadDynamicMesh.vertices = quadVerticesPosition;
+               quadDynamicMesh.triangles = quadTopology;
+               quadDynamicMesh.RecalculateNormals();
+               quadMeshCollider.sharedMesh = quadDynamicMesh;
+
+               quadMeshRenderer.enabled = node.GetComponent<Sofa_MechanicalObject>().isRenderingQuad;
+               quadMeshCollider.enabled = node.GetComponent<Sofa_MechanicalObject>().isQuadCastingRay;
+           }
+           if(tetrahedraDynamicMesh!=null)
+           {
+               //tetrahedraDynamicMesh.Clear();
+               tetrahedraDynamicMesh.triangles = new int[0];
+               tetrahedraDynamicMesh.vertices = new Vector3[0];
+
+               tetrahedraDynamicMesh.vertices = tetrahedraVerticesPosition;
+               tetrahedraDynamicMesh.triangles = tetrahedraTopology;
+               tetrahedraDynamicMesh.RecalculateNormals();
+               tetrahedraMeshCollider.sharedMesh = tetrahedraDynamicMesh;
+
+               tetrahedraMeshRenderer.enabled = node.GetComponent<Sofa_MechanicalObject>().isRenderingTetrahedra;
+               tetrahedraMeshCollider.enabled = node.GetComponent<Sofa_MechanicalObject>().isTetrahedraCastingRay;
+           }
         }
         else
         {
@@ -288,6 +433,9 @@ public unsafe class UnityMechanicalObjectInfo
     public Transform node;
     public string componentName;
     public Vector3[] verticesPosition;
+    public Vector3[] triangleVerticesPosition;
+    public Vector3[] quadVerticesPosition;
+    public Vector3[] tetrahedraVerticesPosition;
     public int[] triangleTopology;
     public int[] quadTopology;
     public int[] tetrahedraTopology;
